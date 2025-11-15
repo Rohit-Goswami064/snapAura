@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import type { EditorAction } from '../types';
+import type { EditorAction } from '../../types';
 import { GIPHY_API_KEY } from '../constants';
 import { SearchIcon } from './icons';
 import EmojiStickerSelector from './EmojiStickerSelector';
@@ -33,8 +33,8 @@ interface GiphyResult {
   title: string;
 }
 
-const GiphyPane: React.FC<{dispatch: React.Dispatch<EditorAction>}> = ({ dispatch }) => {
-  const [query, setQuery] = useState('');
+const GiphyPane: React.FC<{ dispatch: React.Dispatch<EditorAction> }> = ({ dispatch }) => {
+  const [query, setQuery] = useState('Trending stickers');
   const [results, setResults] = useState<GiphyResult[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -46,7 +46,7 @@ const GiphyPane: React.FC<{dispatch: React.Dispatch<EditorAction>}> = ({ dispatc
     let url = '';
     const endpoint = searchQuery ? 'search' : 'trending';
     const queryParam = searchQuery ? `&q=${encodeURIComponent(searchQuery)}` : '';
-    
+
     url = `https://api.giphy.com/v1/stickers/${endpoint}?api_key=${GIPHY_API_KEY}${queryParam}&limit=24&offset=0&rating=g`;
 
     try {
@@ -73,18 +73,18 @@ const GiphyPane: React.FC<{dispatch: React.Dispatch<EditorAction>}> = ({ dispatc
 
   return (
     <div className="space-y-3">
-        <div className="relative">
-             <span className="absolute inset-y-0 left-0 flex items-center pl-3">
-                <SearchIcon className="h-4 w-4 text-gray-400" />
-            </span>
-            <input
-                type="text"
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                placeholder="Search stickers..."
-                className="w-full bg-gray-700 text-white p-2 pl-9 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
-            />
-        </div>
+      <div className="relative">
+        <span className="absolute inset-y-0 left-0 flex items-center pl-3">
+          <SearchIcon className="h-4 w-4 text-gray-400" />
+        </span>
+        <input
+          type="text"
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          placeholder="Search stickers..."
+          className="w-full bg-gray-700 text-white p-2 pl-9 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+        />
+      </div>
       {isLoading && <p className="text-center text-gray-400 py-4">Loading stickers...</p>}
       {error && <p className="text-center text-red-400 py-4">{error}</p>}
       {!isLoading && !error && (
@@ -102,32 +102,30 @@ const GiphyPane: React.FC<{dispatch: React.Dispatch<EditorAction>}> = ({ dispatc
 
 
 const StickerGifSelector: React.FC<StickerGifSelectorProps> = ({ dispatch }) => {
-    const [activeTab, setActiveTab] = useState<'gifs' | 'emoji'>('gifs');
+  const [activeTab, setActiveTab] = useState<'gifs' | 'emoji'>('gifs');
 
-    return (
-        <div className="space-y-4">
-            <div className="grid grid-cols-2 gap-2 rounded-lg bg-gray-800 p-1">
-                <button
-                onClick={() => setActiveTab('gifs')}
-                className={`px-3 py-1.5 text-sm font-semibold rounded-md transition-colors ${
-                    activeTab === 'gifs' ? 'bg-gray-700 text-white' : 'text-gray-300 hover:bg-gray-700/50'
-                }`}
-                >
-                GIFs & Stickers
-                </button>
-                <button
-                onClick={() => setActiveTab('emoji')}
-                className={`px-3 py-1.5 text-sm font-semibold rounded-md transition-colors ${
-                    activeTab === 'emoji' ? 'bg-gray-700 text-white' : 'text-gray-300 hover:bg-gray-700/50'
-                }`}
-                >
-                Emoji
-                </button>
-            </div>
-            {activeTab === 'gifs' && <GiphyPane dispatch={dispatch} />}
-            {activeTab === 'emoji' && <EmojiStickerSelector dispatch={dispatch} />}
-        </div>
-    );
+  return (
+    <div className="space-y-4">
+      <div className="grid grid-cols-2 gap-2 rounded-lg bg-gray-800 p-1">
+        <button
+          onClick={() => setActiveTab('gifs')}
+          className={`px-3 py-1.5 text-sm font-semibold rounded-md transition-colors ${activeTab === 'gifs' ? 'bg-gray-700 text-white' : 'text-gray-300 hover:bg-gray-700/50'
+            }`}
+        >
+          GIFs & Stickers
+        </button>
+        <button
+          onClick={() => setActiveTab('emoji')}
+          className={`px-3 py-1.5 text-sm font-semibold rounded-md transition-colors ${activeTab === 'emoji' ? 'bg-gray-700 text-white' : 'text-gray-300 hover:bg-gray-700/50'
+            }`}
+        >
+          Emoji
+        </button>
+      </div>
+      {activeTab === 'gifs' && <GiphyPane dispatch={dispatch} />}
+      {activeTab === 'emoji' && <EmojiStickerSelector dispatch={dispatch} />}
+    </div>
+  );
 }
 
 export default StickerGifSelector;

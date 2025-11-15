@@ -1,20 +1,20 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import type { GifOverlay as GifOverlayType, EditorAction } from '../types';
+import type { EmojiOverlay as EmojiOverlayType, EditorAction } from '../../types';
 import { DeleteIcon } from './icons';
 
-interface GifOverlayProps {
-  gifOverlay: GifOverlayType;
+interface EmojiOverlayProps {
+  emojiOverlay: EmojiOverlayType;
   dispatch: React.Dispatch<EditorAction>;
   isSelected: boolean;
   onSelect: () => void;
 }
 
-const MIN_WIDTH = 50;
+const MIN_SIZE = 20;
 
-const GifOverlay: React.FC<GifOverlayProps> = ({ gifOverlay, dispatch, isSelected, onSelect }) => {
+const EmojiOverlay: React.FC<EmojiOverlayProps> = ({ emojiOverlay, dispatch, isSelected, onSelect }) => {
   const [mode, setMode] = useState<'idle' | 'drag' | 'resize'>('idle');
-  const [localGif, setLocalGif] = useState(gifOverlay);
-  
+  const [localEmoji, setLocalEmoji] = useState(emojiOverlay);
+
   const elementRef = useRef<HTMLDivElement>(null);
   const interactionStartRef = useRef<{
     x: number; y: number;
@@ -24,8 +24,8 @@ const GifOverlay: React.FC<GifOverlayProps> = ({ gifOverlay, dispatch, isSelecte
   } | null>(null);
 
   useEffect(() => {
-    setLocalGif(gifOverlay);
-  }, [gifOverlay]);
+    setLocalEmoji(emojiOverlay);
+  }, [emojiOverlay]);
 
   const handleMouseDown = (e: React.MouseEvent) => {
     if (isSelected) {
@@ -34,7 +34,7 @@ const GifOverlay: React.FC<GifOverlayProps> = ({ gifOverlay, dispatch, isSelecte
       setMode('drag');
       interactionStartRef.current = {
         x: e.clientX, y: e.clientY,
-        posX: localGif.position.x, posY: localGif.position.y,
+        posX: localEmoji.position.x, posY: localEmoji.position.y,
         width: 0, height: 0, handle: ''
       };
     }
@@ -47,7 +47,7 @@ const GifOverlay: React.FC<GifOverlayProps> = ({ gifOverlay, dispatch, isSelecte
     const rect = elementRef.current!.getBoundingClientRect();
     interactionStartRef.current = {
       x: e.clientX, y: e.clientY,
-      posX: localGif.position.x, posY: localGif.position.y,
+      posX: localEmoji.position.x, posY: localEmoji.position.y,
       width: rect.width, height: rect.height,
       handle,
     };
@@ -56,7 +56,7 @@ const GifOverlay: React.FC<GifOverlayProps> = ({ gifOverlay, dispatch, isSelecte
   const handleDelete = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    dispatch({ type: 'REMOVE_GIF_OVERLAY', payload: gifOverlay.id });
+    dispatch({ type: 'REMOVE_EMOJI_OVERLAY', payload: emojiOverlay.id });
   };
 
   const handleInteractionMove = useCallback((e: MouseEvent) => {
@@ -68,7 +68,7 @@ const GifOverlay: React.FC<GifOverlayProps> = ({ gifOverlay, dispatch, isSelecte
     if (mode === 'drag') {
       const startX = interactionStartRef.current.posX;
       const startY = interactionStartRef.current.posY;
-      setLocalGif(prev => ({
+      setLocalEmoji(prev => ({
         ...prev,
         position: {
           x: startX + dx,
@@ -77,7 +77,7 @@ const GifOverlay: React.FC<GifOverlayProps> = ({ gifOverlay, dispatch, isSelecte
       }));
     } else if (mode === 'resize') {
       const { handle, width: startWidth, height: startHeight, posX: startX, posY: startY } = interactionStartRef.current;
-      
+
       let newWidth = startWidth;
       let newHeight = startHeight;
       let newX = startX;
@@ -93,7 +93,7 @@ const GifOverlay: React.FC<GifOverlayProps> = ({ gifOverlay, dispatch, isSelecte
       if (handle.length === 2) { // Corner resize
         const isLeft = handle.includes('l');
         const isTop = handle.includes('t');
-        
+
         if (Math.abs(dx) > Math.abs(dy)) {
           newHeight = newWidth / aspectRatio;
         } else {
@@ -102,14 +102,14 @@ const GifOverlay: React.FC<GifOverlayProps> = ({ gifOverlay, dispatch, isSelecte
 
         if (isLeft) newX = startX + (startWidth - newWidth);
         if (isTop) newY = startY + (startHeight - newHeight);
-      } else { // Edge resize
-          newHeight = newWidth / aspectRatio; // Maintain ratio
+      } else { // Edge resize - Not implemented for proportional scaling, but can be added
+        newHeight = newWidth / aspectRatio; // Maintain ratio
       }
 
-      if (newWidth >= MIN_WIDTH) {
-        setLocalGif(prev => ({
+      if (newWidth >= MIN_SIZE) {
+        setLocalEmoji(prev => ({
           ...prev,
-          width: newWidth,
+          size: newWidth,
           position: { x: newX, y: newY }
         }));
       }
@@ -118,11 +118,11 @@ const GifOverlay: React.FC<GifOverlayProps> = ({ gifOverlay, dispatch, isSelecte
 
   const handleInteractionEnd = useCallback(() => {
     if (mode !== 'idle') {
-      dispatch({ type: 'UPDATE_GIF_OVERLAY', payload: { ...localGif } });
+      dispatch({ type: 'UPDATE_EMOJI_OVERLAY', payload: { ...localEmoji } });
       setMode('idle');
       interactionStartRef.current = null;
     }
-  }, [mode, dispatch, localGif]);
+  }, [mode, dispatch, localEmoji]);
 
   useEffect(() => {
     window.addEventListener('mousemove', handleInteractionMove);
@@ -138,34 +138,38 @@ const GifOverlay: React.FC<GifOverlayProps> = ({ gifOverlay, dispatch, isSelecte
     tl: 'nwse-resize', tr: 'nesw-resize',
     bl: 'nesw-resize', br: 'nwse-resize',
   };
-  
+
   return (
     <div
       ref={elementRef}
       className="absolute z-20"
       style={{
-        left: localGif.position.x,
-        top: localGif.position.y,
-        width: `${localGif.width}px`,
+        left: localEmoji.position.x,
+        top: localEmoji.position.y,
+        width: `${localEmoji.size}px`,
+        height: `${localEmoji.size}px`,
         cursor: isSelected ? (mode === 'drag' ? 'grabbing' : 'grab') : 'default',
       }}
       onMouseDown={handleMouseDown}
       onClick={(e) => { e.stopPropagation(); onSelect(); }}
     >
-      <img
-        src={gifOverlay.url}
-        alt="sticker"
-        className="select-none pointer-events-none w-full h-auto"
+      <span
+        className="select-none w-full h-full flex items-center justify-center"
         style={{
-          filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.3))',
+          fontSize: `${localEmoji.size}px`,
+          lineHeight: 1,
+          textShadow: '0 4px 8px rgba(0,0,0,0.3)',
         }}
-      />
+      >
+        {emojiOverlay.emoji}
+      </span>
+
       {isSelected && (
         <>
           <div className="absolute -top-8 left-1/2 -translate-x-1/2">
-              <button title="Delete" onClick={handleDelete} className="p-1.5 bg-gray-800 border border-gray-700 rounded-full shadow-lg hover:bg-red-500/80 transition-colors">
-                  <DeleteIcon className="w-4 h-4 text-white"/>
-              </button>
+            <button title="Delete" onClick={handleDelete} className="p-1.5 bg-gray-800 border border-gray-700 rounded-full shadow-lg hover:bg-red-500/80 transition-colors">
+              <DeleteIcon className="w-4 h-4 text-white" />
+            </button>
           </div>
           <div className="absolute inset-0 border-2 border-green-500 pointer-events-none" />
           {handles.map(handle => (
@@ -188,4 +192,4 @@ const GifOverlay: React.FC<GifOverlayProps> = ({ gifOverlay, dispatch, isSelecte
   );
 };
 
-export default GifOverlay;
+export default EmojiOverlay;

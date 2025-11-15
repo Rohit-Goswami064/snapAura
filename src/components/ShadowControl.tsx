@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { SHADOW_PRESETS } from '../constants';
-import type { ShadowPreset } from '../types';
+import type { ShadowPreset } from '../../types';
 
 interface ShadowControlProps {
   currentShadow: string;
@@ -15,9 +15,8 @@ const ShadowControl: React.FC<ShadowControlProps> = ({ currentShadow, onShadowCh
         <button
           key={preset.name}
           onClick={() => onShadowChange(preset.value)}
-          className={`px-3 py-2 text-sm rounded-md transition-colors ${
-            currentShadow === preset.value ? 'bg-indigo-600 text-white' : 'bg-gray-700 hover:bg-gray-600'
-          }`}
+          className={`px-3 py-2 text-sm rounded-md transition-colors ${currentShadow === preset.value ? 'bg-indigo-600 text-white' : 'bg-gray-700 hover:bg-gray-600'
+            }`}
         >
           {preset.name}
         </button>

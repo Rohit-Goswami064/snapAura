@@ -1,27 +1,20 @@
 import React, { useReducer, useCallback, useState, useEffect } from 'react';
-import type { EditorState, EditorAction, User } from './types';
-import { INITIAL_STATE } from './constants';
+import type { EditorState, EditorAction, User } from '../types';
+import { INITIAL_STATE } from './constants.ts';
 import Topbar from './components/Topbar';
 import LeftSidebar from './components/LeftSidebar';
 import RightSidebar from './components/RightSidebar';
 import Canvas from './components/Canvas';
 import LandingPage from './components/LandingPage';
+import { useAuth } from './contexts/authContext/index.jsx';
 
-// Add `google` to the window object for TypeScript
-declare global {
-  interface Window {
-    google: any;
-  }
-}
-
-function decodeJwtResponse(token: string) {
-  const base64Url = token.split('.')[1];
-  const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-  const jsonPayload = decodeURIComponent(atob(base64).split('').map(function (c) {
-    return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
-  }).join(''));
-
-  return JSON.parse(jsonPayload);
+// Helper function to convert Firebase user to User type
+function convertFirebaseUserToUser(firebaseUser: any): User {
+  return {
+    name: firebaseUser.displayName || firebaseUser.email?.split('@')[0] || 'User',
+    email: firebaseUser.email || '',
+    picture: firebaseUser.photoURL || `https://ui-avatars.com/api/?name=${encodeURIComponent(firebaseUser.displayName || firebaseUser.email || 'User')}&background=4f46e5&color=fff&size=128`,
+  };
 }
 
 
@@ -116,73 +109,43 @@ function editorReducer(state: EditorState, action: EditorAction): EditorState {
       return state;
   }
 }
-
 function App() {
   const [state, dispatch] = useReducer(editorReducer, INITIAL_STATE);
   const [showEditor, setShowEditor] = useState(false);
-  const [isGsiReady, setIsGsiReady] = useState(false);
+  const { user: authUser, loginWithGoogle, logout: authLogout, loading: authLoading } = useAuth();
 
-  const handleLogin = useCallback((response: any) => {
-    const userObject = decodeJwtResponse(response.credential);
-    const user: User = {
-      name: userObject.name,
-      email: userObject.email,
-      picture: userObject.picture,
-    };
-    dispatch({ type: 'LOGIN', payload: user });
-  }, []);
-
-  const handleLogout = useCallback(() => {
-    dispatch({ type: 'LOGOUT' });
-    if (window.google) {
-      window.google.accounts.id.disableAutoSelect();
-    }
-  }, []);
-
+  // Sync auth context user with app state
   useEffect(() => {
-    // Wait for Google Sign-In script to load
-    const initializeGoogleSignIn = () => {
-      if (window.google && window.google.accounts) {
-        const clientId = process.env.GOOGLE_CLIENT_ID;
-        if (clientId && !clientId.includes('YOUR_GOOGLE_CLIENT_ID')) {
-          window.google.accounts.id.initialize({
-            client_id: clientId,
-            callback: handleLogin,
-            use_fedcm_for_prompt: false
-          });
-          setIsGsiReady(true);
-        } else {
-          console.warn('Google Sign-In is not configured. `process.env.GOOGLE_CLIENT_ID` is missing or is a placeholder.');
-        }
-      }
-    };
-
-    // Check if Google script is already loaded
-    if (window.google && window.google.accounts) {
-      initializeGoogleSignIn();
+    if (authUser) {
+      const user: User = convertFirebaseUserToUser(authUser);
+      dispatch({ type: 'LOGIN', payload: user });
     } else {
-      // Wait for the script to load
-      const checkGoogleScript = setInterval(() => {
-        if (window.google && window.google.accounts) {
-          clearInterval(checkGoogleScript);
-          initializeGoogleSignIn();
-        }
-      }, 100);
-
-      // Cleanup interval after 10 seconds
-      const timeout = setTimeout(() => {
-        clearInterval(checkGoogleScript);
-        if (!window.google || !window.google.accounts) {
-          console.error('Google Sign-In script failed to load. Please check your internet connection and ensure the Google Sign-In script is accessible.');
-        }
-      }, 10000);
-
-      return () => {
-        clearInterval(checkGoogleScript);
-        clearTimeout(timeout);
-      };
+      dispatch({ type: 'LOGOUT' });
     }
-  }, [handleLogin]);
+  }, [authUser]);
+
+  const handleGoogleLoginSuccess = useCallback(async () => {
+    try {
+      await loginWithGoogle();
+      console.log('✅ Google login successful');
+    } catch (error) {
+      console.error('❌ Google login failed:', error);
+    }
+  }, [loginWithGoogle]);
+
+  const handleGoogleLoginError = useCallback(() => {
+    console.error('Google login failed');
+  }, []);
+
+  const handleLogout = useCallback(async () => {
+    try {
+      await authLogout();
+      dispatch({ type: 'LOGOUT' });
+      console.log('✅ Logout successful');
+    } catch (error) {
+      console.error('❌ Logout failed:', error);
+    }
+  }, [authLogout]);
 
 
   const handleExport = useCallback(async () => {
@@ -235,7 +198,9 @@ function App() {
         dispatch={dispatch}
         handleExport={handleExport}
         handleLogout={handleLogout}
-        isGsiReady={isGsiReady}
+        onGoogleLoginSuccess={handleGoogleLoginSuccess}
+        onGoogleLoginError={handleGoogleLoginError}
+        isLoading={authLoading}
       />
       <div className="flex flex-1 overflow-hidden">
         <LeftSidebar state={state} dispatch={dispatch} onUpload={handleSetScreenshot} />

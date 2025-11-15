@@ -1,10 +1,10 @@
 import React from 'react';
-import type { BrowserFrame } from '../types';
+import type { BrowserFrame } from '../../types';
 import { BROWSER_FRAMES } from '../constants';
 
 interface BrowserFrameSelectorProps {
-  currentFrame: BrowserFrame;
-  onFrameChange: (frame: BrowserFrame) => void;
+    currentFrame: BrowserFrame;
+    onFrameChange: (frame: BrowserFrame) => void;
 }
 
 const BrowserFrameSelector: React.FC<BrowserFrameSelectorProps> = ({ currentFrame, onFrameChange }) => {
@@ -16,15 +16,15 @@ const BrowserFrameSelector: React.FC<BrowserFrameSelectorProps> = ({ currentFram
             </div>
             <div className="grid grid-cols-3 gap-3">
                 {BROWSER_FRAMES.map((frame) => (
-                    <button 
-                        key={frame.type} 
+                    <button
+                        key={frame.type}
                         title={frame.name}
                         onClick={() => onFrameChange(frame)}
                         className={`relative aspect-[16/10] rounded-lg p-1 border-2 transition-colors ${currentFrame.type === frame.type ? 'border-indigo-500' : 'border-gray-800 hover:border-gray-700'}`}
                     >
                         {frame.type === 'none' ? (
                             <div className="w-full h-full flex items-center justify-center">
-                               <svg className="w-6 h-6 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <svg className="w-6 h-6 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
                                 </svg>
                             </div>
@@ -40,7 +40,7 @@ const BrowserFrameSelector: React.FC<BrowserFrameSelectorProps> = ({ currentFram
                                 <div className={`flex-grow ${frame.classNames.body}`}></div>
                             </div>
                         )}
-                         <span className="absolute -bottom-5 left-1/2 -translate-x-1/2 text-xs text-gray-500">{frame.name}</span>
+                        <span className="absolute -bottom-5 left-1/2 -translate-x-1/2 text-xs text-gray-500">{frame.name}</span>
                     </button>
                 ))}
             </div>

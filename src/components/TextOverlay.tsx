@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import type { TextOverlay as TextOverlayType, EditorAction } from '../types';
+import type { TextOverlay as TextOverlayType, EditorAction } from '../../types';
 import { DeleteIcon, AlignLeftIcon, AlignCenterIcon, AlignRightIcon, BoldIcon, ItalicIcon } from './icons';
 
 interface TextOverlayProps {
@@ -27,7 +27,7 @@ const TextOverlay: React.FC<TextOverlayProps> = ({ textOverlay, dispatch }) => {
     if (target instanceof HTMLInputElement || target.closest('button') || (target instanceof HTMLParagraphElement && target.isContentEditable)) {
       return;
     }
-    
+
     setIsDragging(true);
     const elemRect = elementRef.current!.getBoundingClientRect();
     dragStartOffset.current = {
@@ -39,8 +39,8 @@ const TextOverlay: React.FC<TextOverlayProps> = ({ textOverlay, dispatch }) => {
 
   const handleMouseMove = useCallback((e: MouseEvent) => {
     if (isDragging) {
-       const parentRect = elementRef.current?.parentElement?.getBoundingClientRect();
-       if (!parentRect) return;
+      const parentRect = elementRef.current?.parentElement?.getBoundingClientRect();
+      if (!parentRect) return;
 
       setPosition({
         x: e.clientX - parentRect.left - dragStartOffset.current.x,
@@ -55,36 +55,36 @@ const TextOverlay: React.FC<TextOverlayProps> = ({ textOverlay, dispatch }) => {
       dispatch({ type: 'UPDATE_TEXT_OVERLAY', payload: { ...textOverlay, position } });
     }
   }, [isDragging, dispatch, textOverlay, position]);
-  
+
   const handleTextChange = (e: React.FocusEvent<HTMLParagraphElement>) => {
     dispatch({ type: 'UPDATE_TEXT_OVERLAY', payload: { ...textOverlay, text: e.currentTarget.textContent || '' } });
   };
-  
+
   const handleColorChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     dispatch({ type: 'UPDATE_TEXT_OVERLAY', payload: { ...textOverlay, color: e.target.value, position } });
   };
-  
+
   const handleFontSizeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     dispatch({ type: 'UPDATE_TEXT_OVERLAY', payload: { ...textOverlay, fontSize: parseInt(e.target.value, 10), position } });
   };
 
-    const handleTextAlignChange = (align: 'left' | 'center' | 'right') => {
-        dispatch({ type: 'UPDATE_TEXT_OVERLAY', payload: { ...textOverlay, textAlign: align, position } });
-    };
+  const handleTextAlignChange = (align: 'left' | 'center' | 'right') => {
+    dispatch({ type: 'UPDATE_TEXT_OVERLAY', payload: { ...textOverlay, textAlign: align, position } });
+  };
 
-    const toggleBold = () => {
-        const newWeight = textOverlay.fontWeight === 'bold' ? 'normal' : 'bold';
-        dispatch({ type: 'UPDATE_TEXT_OVERLAY', payload: { ...textOverlay, fontWeight: newWeight, position } });
-    };
+  const toggleBold = () => {
+    const newWeight = textOverlay.fontWeight === 'bold' ? 'normal' : 'bold';
+    dispatch({ type: 'UPDATE_TEXT_OVERLAY', payload: { ...textOverlay, fontWeight: newWeight, position } });
+  };
 
-    const toggleItalic = () => {
-        const newStyle = textOverlay.fontStyle === 'italic' ? 'normal' : 'italic';
-        dispatch({ type: 'UPDATE_TEXT_OVERLAY', payload: { ...textOverlay, fontStyle: newStyle, position } });
-    };
+  const toggleItalic = () => {
+    const newStyle = textOverlay.fontStyle === 'italic' ? 'normal' : 'italic';
+    dispatch({ type: 'UPDATE_TEXT_OVERLAY', payload: { ...textOverlay, fontStyle: newStyle, position } });
+  };
 
-    const handleShadowChange = (shadow: string) => {
-        dispatch({ type: 'UPDATE_TEXT_OVERLAY', payload: { ...textOverlay, textShadow: shadow, position } });
-    };
+  const handleShadowChange = (shadow: string) => {
+    dispatch({ type: 'UPDATE_TEXT_OVERLAY', payload: { ...textOverlay, textShadow: shadow, position } });
+  };
 
 
   useEffect(() => {
@@ -96,10 +96,10 @@ const TextOverlay: React.FC<TextOverlayProps> = ({ textOverlay, dispatch }) => {
       window.removeEventListener('mouseup', handleMouseUp);
     };
   }, [handleMouseMove, handleMouseUp]);
-  
+
   useEffect(() => {
     if (!isDragging) {
-        setPosition(textOverlay.position);
+      setPosition(textOverlay.position);
     }
   }, [textOverlay.position, isDragging]);
 
@@ -110,38 +110,38 @@ const TextOverlay: React.FC<TextOverlayProps> = ({ textOverlay, dispatch }) => {
       style={{ left: position.x, top: position.y }}
       onMouseDown={handleMouseDown}
     >
-      <div 
+      <div
         className="relative"
         style={{ cursor: isDragging ? 'grabbing' : 'grab' }}
       >
         <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-max hidden group-hover:flex group-focus-within:flex flex-col items-center gap-2">
-            <div className="flex items-center gap-1 p-1.5 bg-gray-800 border border-gray-700 rounded-lg shadow-lg">
-                <input type="color" value={textOverlay.color} onChange={handleColorChange} className="w-7 h-7 bg-transparent border-none cursor-pointer" />
-                <input type="number" value={textOverlay.fontSize} onChange={handleFontSizeChange} className="w-16 bg-gray-700 text-white p-1 rounded-md text-sm" />
-                <div className="w-px h-6 bg-gray-700 mx-1"></div>
-                <button title="Align Left" onClick={() => handleTextAlignChange('left')} className={`p-1 rounded ${textOverlay.textAlign === 'left' ? 'bg-indigo-600' : 'hover:bg-gray-700'}`}><AlignLeftIcon /></button>
-                <button title="Align Center" onClick={() => handleTextAlignChange('center')} className={`p-1 rounded ${textOverlay.textAlign === 'center' ? 'bg-indigo-600' : 'hover:bg-gray-700'}`}><AlignCenterIcon /></button>
-                <button title="Align Right" onClick={() => handleTextAlignChange('right')} className={`p-1 rounded ${textOverlay.textAlign === 'right' ? 'bg-indigo-600' : 'hover:bg-gray-700'}`}><AlignRightIcon /></button>
-                <div className="w-px h-6 bg-gray-700 mx-1"></div>
-                <button title="Bold" onClick={toggleBold} className={`p-1 rounded ${textOverlay.fontWeight === 'bold' ? 'bg-indigo-600' : 'hover:bg-gray-700'}`}><BoldIcon /></button>
-                <button title="Italic" onClick={toggleItalic} className={`p-1 rounded ${textOverlay.fontStyle === 'italic' ? 'bg-indigo-600' : 'hover:bg-gray-700'}`}><ItalicIcon /></button>
-                <div className="w-px h-6 bg-gray-700 mx-1"></div>
-                <button title="Delete" onClick={() => dispatch({type: 'REMOVE_TEXT_OVERLAY', payload: textOverlay.id})} className="p-1 hover:bg-gray-700 rounded">
-                    <DeleteIcon />
-                </button>
-            </div>
-            <div className="flex items-center gap-1 p-1.5 bg-gray-800 border border-gray-700 rounded-lg shadow-lg">
-                <span className="text-xs text-gray-400 mr-1">Shadow:</span>
-                 {TEXT_SHADOW_PRESETS.map(preset => (
-                    <button 
-                        key={preset.name}
-                        onClick={() => handleShadowChange(preset.value)} 
-                        className={`px-2 py-1 text-xs rounded transition-colors ${textOverlay.textShadow === preset.value ? 'bg-indigo-600' : 'bg-gray-700 hover:bg-gray-600'}`}
-                    >
-                        {preset.name}
-                    </button>
-                 ))}
-            </div>
+          <div className="flex items-center gap-1 p-1.5 bg-gray-800 border border-gray-700 rounded-lg shadow-lg">
+            <input type="color" value={textOverlay.color} onChange={handleColorChange} className="w-7 h-7 bg-transparent border-none cursor-pointer" />
+            <input type="number" value={textOverlay.fontSize} onChange={handleFontSizeChange} className="w-16 bg-gray-700 text-white p-1 rounded-md text-sm" />
+            <div className="w-px h-6 bg-gray-700 mx-1"></div>
+            <button title="Align Left" onClick={() => handleTextAlignChange('left')} className={`p-1 rounded ${textOverlay.textAlign === 'left' ? 'bg-indigo-600' : 'hover:bg-gray-700'}`}><AlignLeftIcon /></button>
+            <button title="Align Center" onClick={() => handleTextAlignChange('center')} className={`p-1 rounded ${textOverlay.textAlign === 'center' ? 'bg-indigo-600' : 'hover:bg-gray-700'}`}><AlignCenterIcon /></button>
+            <button title="Align Right" onClick={() => handleTextAlignChange('right')} className={`p-1 rounded ${textOverlay.textAlign === 'right' ? 'bg-indigo-600' : 'hover:bg-gray-700'}`}><AlignRightIcon /></button>
+            <div className="w-px h-6 bg-gray-700 mx-1"></div>
+            <button title="Bold" onClick={toggleBold} className={`p-1 rounded ${textOverlay.fontWeight === 'bold' ? 'bg-indigo-600' : 'hover:bg-gray-700'}`}><BoldIcon /></button>
+            <button title="Italic" onClick={toggleItalic} className={`p-1 rounded ${textOverlay.fontStyle === 'italic' ? 'bg-indigo-600' : 'hover:bg-gray-700'}`}><ItalicIcon /></button>
+            <div className="w-px h-6 bg-gray-700 mx-1"></div>
+            <button title="Delete" onClick={() => dispatch({ type: 'REMOVE_TEXT_OVERLAY', payload: textOverlay.id })} className="p-1 hover:bg-gray-700 rounded">
+              <DeleteIcon />
+            </button>
+          </div>
+          <div className="flex items-center gap-1 p-1.5 bg-gray-800 border border-gray-700 rounded-lg shadow-lg">
+            <span className="text-xs text-gray-400 mr-1">Shadow:</span>
+            {TEXT_SHADOW_PRESETS.map(preset => (
+              <button
+                key={preset.name}
+                onClick={() => handleShadowChange(preset.value)}
+                className={`px-2 py-1 text-xs rounded transition-colors ${textOverlay.textShadow === preset.value ? 'bg-indigo-600' : 'bg-gray-700 hover:bg-gray-600'}`}
+              >
+                {preset.name}
+              </button>
+            ))}
+          </div>
         </div>
         <p
           contentEditable
