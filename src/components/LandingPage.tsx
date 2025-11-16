@@ -1,5 +1,4 @@
 import React, { useState, useRef } from 'react';
-import { SnapAuraLogoIcon } from './icons';
 
 interface LandingPageProps {
   onStart: () => void;
@@ -41,10 +40,10 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
         {/* Header */}
         <header className="flex justify-between items-center px-6 py-4 max-w-7xl mx-auto">
           <div className="flex items-center gap-2 cursor-pointer" onClick={() => window.location.reload()}>
-            <SnapAuraLogoIcon className="w-7 h-7 text-white" />
+            <img src="/sanpAura_logo.png" alt="SnapAura Logo" className="w-10 h-10" />
             <span className="font-bold text-xl">SnapAura</span>
           </div>
-          <button 
+          <button
             onClick={onStart}
             className="px-5 py-2.5 bg-gray-900 hover:bg-gray-800 text-white rounded-lg font-medium text-sm transition-colors border border-gray-800"
           >
@@ -67,10 +66,9 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
           </div>
 
           {/* Upload Area */}
-          <div 
-            className={`relative bg-gray-900/40 backdrop-blur-sm border-2 ${
-              isDragging ? 'border-purple-500 bg-purple-500/10' : 'border-gray-800'
-            } border-dashed rounded-3xl p-12 md:p-20 mb-16 transition-all duration-300`}
+          <div
+            className={`relative bg-gray-900/40 backdrop-blur-sm border-2 ${isDragging ? 'border-purple-500 bg-purple-500/10' : 'border-gray-800'
+              } border-dashed rounded-3xl p-12 md:p-20 mb-16 transition-all duration-300`}
             onDragOver={handleDragOver}
             onDragLeave={handleDragLeave}
             onDrop={handleDrop}
@@ -78,17 +76,17 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
             <div className="flex flex-col items-center justify-center text-center space-y-6">
               {/* Upload Icon */}
               <div className="w-16 h-16 bg-purple-500/10 rounded-full flex items-center justify-center">
-                <svg 
-                  className="w-8 h-8 text-purple-400" 
-                  fill="none" 
-                  stroke="currentColor" 
+                <svg
+                  className="w-8 h-8 text-purple-400"
+                  fill="none"
+                  stroke="currentColor"
                   viewBox="0 0 24 24"
                 >
-                  <path 
-                    strokeLinecap="round" 
-                    strokeLinejoin="round" 
-                    strokeWidth={2} 
-                    d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" 
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
                   />
                 </svg>
               </div>

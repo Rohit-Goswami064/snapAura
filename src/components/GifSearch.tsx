@@ -81,27 +81,27 @@ const GifSearch: React.FC<GifSearchProps> = ({ dispatch }) => {
   };
 
   return (
-    <div className="space-y-3">
+    <div className="space-y-4">
       <div className="relative">
-        <span className="absolute inset-y-0 left-0 flex items-center pl-3">
-          <SearchIcon className="h-4 w-4 text-gray-400" />
+        <span className="absolute inset-y-0 left-0 flex items-center pl-4">
+          <SearchIcon className="h-5 w-5 text-gray-400" />
         </span>
         <input
           type="text"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder="Search for GIFs..."
-          className="w-full bg-gray-700 text-white p-2 pl-9 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          className="w-full bg-gray-700 text-white p-3 pl-11 rounded-lg text-base focus:outline-none focus:ring-2 focus:ring-indigo-500"
         />
       </div>
 
-      {isLoading && <p className="text-center text-gray-400">Loading...</p>}
-      {error && <p className="text-center text-red-400">{error}</p>}
+      {isLoading && <p className="text-center text-gray-400 text-base">Loading...</p>}
+      {error && <p className="text-center text-red-400 text-sm">{error}</p>}
 
       {!isLoading && !error && (
-        <div className="grid grid-cols-3 gap-2 max-h-60 overflow-y-auto custom-scrollbar pr-1">
+        <div className="grid grid-cols-2 gap-3 max-h-[500px] overflow-y-auto custom-scrollbar pr-1">
           {gifs.map((gif) => (
-            <button key={gif.id} onClick={() => handleSelectGif(gif.images.fixed_width.url)} className="aspect-square bg-gray-700 rounded-md overflow-hidden focus:outline-none focus:ring-2 focus:ring-indigo-500 ring-offset-2 ring-offset-gray-900">
+            <button key={gif.id} onClick={() => handleSelectGif(gif.images.fixed_width.url)} className="aspect-square bg-gray-700 rounded-lg overflow-hidden focus:outline-none focus:ring-2 focus:ring-indigo-500 ring-offset-2 ring-offset-gray-900 hover:ring-2 hover:ring-indigo-400 transition-all">
               <img src={gif.images.fixed_width.url} alt="gif" className="w-full h-full object-cover" />
             </button>
           ))}

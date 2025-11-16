@@ -5,8 +5,7 @@ import type { EditorState, EditorAction, Background, Gradient } from '../../type
 import TextOverlay from './TextOverlay';
 import EmojiOverlay from './EmojiOverlay';
 import GifOverlay from './GifOverlay';
-// FIX: Import SnapAuraLogoIcon to resolve missing component error.
-import { ImagePlaceholderIcon, SnapAuraLogoIcon } from './icons';
+import { ImagePlaceholderIcon } from './icons';
 import ImageUploader from './ImageUploader';
 
 interface CanvasProps {
@@ -87,8 +86,9 @@ const Canvas: React.FC<CanvasProps> = ({ state, dispatch, onUpload }) => {
                 maxHeight: '400px',
               }}
             />
+
             <div className="absolute bottom-2 right-3 text-xs text-white/40 font-semibold pointer-events-none flex items-center gap-1">
-              <SnapAuraLogoIcon className="w-3 h-3" />
+              <img src="/sanpAura_logo.png" alt="SnapAura" className="w-6 h-6" />
               Designed in SnapAura
             </div>
           </div>

@@ -1,7 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import type { EditorState, EditorAction } from '../../types';
 import {
-  SnapAuraLogoIcon,
   UndoIcon,
   RedoIcon,
   ExportIcon,
@@ -48,7 +47,7 @@ const Topbar: React.FC<TopbarProps> = ({ state, dispatch, handleExport, handleLo
   return (
     <header className="flex items-center justify-between px-4 py-2 bg-gray-900 border-b border-gray-800 h-16 shrink-0 z-20">
       <div className="flex items-center gap-2">
-        <SnapAuraLogoIcon className="w-8 h-8 text-indigo-500" />
+        <img src="/sanpAura_logo.png" alt="SnapAura Logo" className="w-16 h-16" />
         <div className="flex items-center gap-1 ml-4">
           <button className="p-2 text-gray-400 hover:bg-gray-800 hover:text-white rounded-md disabled:opacity-50 disabled:cursor-not-allowed" disabled>
             <UndoIcon />
